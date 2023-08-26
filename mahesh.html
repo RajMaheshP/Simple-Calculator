@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-image: url('https://e1.pxfuel.com/desktop-wallpaper/932/420/desktop-wallpaper-high-quality-blackboard-blackboard.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+      #calculator {
+        background-color: #1E0691;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(245, 244, 244, 0.2);
+        padding: 20px;
+        width: 500px;
+        height: 500px;
+      }
+      #display {
+        font-size: 40px;
+        margin-bottom: 10px;
+        text-align: right;
+        padding: 10px;
+        border: 2px solid #e8e3e3;
+        background-color: #a8c64e;
+        border-radius: 5px;
+      }
+      .btn {
+        font-size: 40px;
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.2s;
+        
+      }
+      .btn.operator {
+        background-color: #e0dfdf;
+      }
+      .btn.equal {
+        background-color: #85c1e9;
+        color: #fff;
+      }
+      .btn.clear {
+        background-color: #e74c3c;
+        color: #fff;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        height: 80px;
+      }
+      .btn.small {
+        flex-basis: calc(25% - 5px);
+      }
+      .btn {
+        flex-basis: calc(25% - 5px);
+      }
+
+      /* Add the button animations here */
+      .btn:hover {
+        transform: scale(1.1);
+      }
+      .btn:active {
+        transform: scale(0.9);
+      }
+      .btn.equal:hover {
+        background-color: #6a89cc;
+      }
+
+      /* Add the style for the blurred effect */
+      #calculator.power-off .btn:not(#power) {
+        filter: blur(4px);
+        pointer-events: none;
+      }
+      /* Add the style for the powered-off display */
+      #calculator.power-off #display {
+      font-size: 45px;
+      /* Adjust the height as needed */
+      padding: 5px;
+     }
+
+    </style>
+</head>
+<body>
+  <div id="calculator">
+    <div id="display">0</div>
+    <div class="row">
+      <button class="btn clear">AC</button>
+      <button class="btn clear">CE</button>
+      <button class="btn operator">+</button>
+      <button class="btn operator">-</button>
+    </div>
+    <div class="row">
+      <button class="btn">7</button>
+      <button class="btn">8</button>
+      <button class="btn">9</button>
+      <button class="btn operator">*</button>
+    </div>
+    <div class="row">
+      <button class="btn">4</button>
+      <button class="btn">5</button>
+      <button class="btn">6</button>
+      <button class="btn operator">/</button>
+    </div>
+    <div class="row">
+      <button class="btn">1</button>
+      <button class="btn">2</button>
+      <button class="btn">3</button>
+      <button class="btn equal">=</button>
+    </div>
+    <div class="row">
+      <button class="btn">0</button>
+      <button class="btn">.</button>
+      <button class="btn">⟳</button>
+      <button class="btn" id="power"><img src="https://www.freeiconspng.com/uploads/red-power-button-icon-24.png" height="50" width="*" alt="Red Power Button Icon" /></button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+    const buttons = document.querySelectorAll(".btn");
+    let currentInput = "";
+    let prevInput = "";      
+    let currentOperator = "";  
+      
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const value = button.textContent;
+  
+        if (value === "=") {
+          if (currentInput !== "") {
+            const result = operate(prevInput, currentOperator, currentInput);
+            display.textContent = result;
+            currentInput = result;
+            prevInput = "";
+            currentOperator = "";
+          }
+        } else if (value === "AC") {
+          currentInput = "";
+          prevInput = "";
+          currentOperator = "";
+          display.textContent = "0";
+        } else if (value === "CE" || value === "⟳") {
+          currentInput = "";
+          display.textContent = "0";
+        } else if (["+", "-", "*", "/"].includes(value)) {
+          if (currentInput !== "") {
+            prevInput = currentInput;
+            currentOperator = value;
+            currentInput = "";
+            display.textContent = prevInput + " " + currentOperator;
+          }
+        } else {
+          currentInput += value;
+          display.textContent = currentInput;
+        }
+      });
+    });
+  
+    function operate(num1, operator, num2) {
+      switch (operator) {
+        case "+":
+          return parseFloat(num1) + parseFloat(num2);
+        case "-":
+          return parseFloat(num1) - parseFloat(num2);
+        case "*":
+          return parseFloat(num1) * parseFloat(num2);
+        case "/":
+          return parseFloat(num1) / parseFloat(num2);
+        default:
+          return num2;
+      }
+    }
+
+// Add event listener to the power button
+const powerButton = document.getElementById("power");
+powerButton.addEventListener("click", () => {
+  const calculator = document.getElementById("calculator");
+  
+  if (calculator.classList.contains("power-off")) {
+    calculator.classList.remove("power-off");
+    display.textContent = "Power ON";
+    display.style.fontSize = "45px"; // Increase font size
+    setTimeout(() => {
+      display.textContent = "0"; // Change to "0" after 2 seconds
+    }, 1000);
+  } else {
+    calculator.classList.add("power-off");
+    display.textContent = "Power OFF"; // Clear the display
+    display.style.fontSize = "45px"; // Reset font size
+  }
+});
+
+
+  </script>
+  
+</body>
+</html>
